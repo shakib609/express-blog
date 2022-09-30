@@ -1,0 +1,16 @@
+version: '3'
+services:
+  cache:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+  db:
+    image: postgres:13-alpine
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}

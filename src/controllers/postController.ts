@@ -10,15 +10,18 @@ export class PostController {
       relations: {
         author: true,
       },
+      order: {
+        createdAt: "DESC",
+      },
     });
     res.json(posts);
   };
 
   getPost = async (req: Request, res: Response, _next: NextFunction) => {
-    const id = req.params.id;
+    const postId = Number(req.params.postId);
     const post = await this.repository.findOne({
       relations: { author: true },
-      where: { id: Number(id) },
+      where: { id: postId },
     });
     if (post) {
       res.json(post);
@@ -48,10 +51,11 @@ export class PostController {
   };
 
   updatePost = async (req: Request, res: Response, _next: NextFunction) => {
+    const postId = Number(req.params.postId);
     const payload = req.body;
     const post = await this.repository.findOne({
       relations: { author: true },
-      where: { id: Number(req.params.id), author: { id: req.user?.id } },
+      where: { id: postId, author: { id: req.user?.id } },
     });
     if (!post) {
       res.status(404).json({ message: "Post not found" });
@@ -64,8 +68,8 @@ export class PostController {
   };
 
   deletePost = async (req: Request, res: Response, _next: NextFunction) => {
-    const id = Number(req.params.id);
-    this.repository.delete({ id, author: { id: req.user?.id } });
+    const postId = Number(req.params.postId);
+    await this.repository.delete({ id: postId, author: { id: req.user?.id } });
     res.status(200).json({ message: "Post deleted successfully" });
   };
 }
